@@ -4,7 +4,7 @@
 #### If you want to use this configs, follow the steps bellow:
 
 <div align='center'>
-    <img src="./img/Neovim-mark.svg" width="800" height="400"/>
+    <img src="./img/Neovim-mark.svg" width="250" height="250"/>
 </div>
 
 ##### 1. Copy all this files to your path `/.config/nvim`.
