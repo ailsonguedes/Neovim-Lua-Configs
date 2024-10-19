@@ -44,7 +44,7 @@ vim.o.incsearch = true -- Incremental search
 vim.o.ignorecase = true -- Ignore cas in search
 vim.smartcase = true -- Consider case if there is a upper case character
 vim.o.scrolloff = 8 -- Minimum number of lines to keep above and below the cursor
-vim.o.colorcolumn = 100 -- Draws a line at the giver lines to keep aware of the line size
+vim.o.colorcolumn = "100" -- Draws a line at the giver lines to keep aware of the line size
 vim.o.signcolumn = 'yes' -- Add a column on the left. Useful for linting.
 vim.o.cmdheight = 2 -- Give more space for displaying messages
 vim.o.updatetime = 100 -- Time in miliseconds to consider the changes
@@ -55,7 +55,7 @@ vim.o.splitright = true -- Create the vertical splits to the right
 vim.o.splitbelow = true -- Create the horizontal splits below
 vim.o.autoread = true -- Update vim after file update from outside
 vim.o.mouse = 'a' -- Eneable mouse support
-vim.o.filetype = true -- Detect and set the filetype option and trigger the FileTYpe Event
+vim.cmd('filetype on') -- Detect and set the filetype option and trigger the FileTYpe Event
 vim.cmd('filetype plugin on') -- Load the plugin file for the file type, if any
 vim.cmd('filetype indent on') -- Load the indent file for the file type, if any
 
@@ -164,3 +164,17 @@ if vim.fn.has('nvim') == 1 then
     vim.api.nvim_set_keymap('n', '<leader>fh', '<cmd>Telescope help_tags<cr>', {noremap = true, silent = true})
 
 end
+
+-- C/C++
+vim.g.ale_c_clangformat_options = [["-style"{
+    BasedOnStyle: google, 
+    IndentWidth: 4, 
+    ColumnLimit: 100,
+    AllowShortBlocksOnASingleLine: Always,
+    AllowShortFunctionsOnASingleLine: Inline,
+    FixNamespaceComments: true,
+    ReflowComments: false,
+}
+]]
+
+
