@@ -1,0 +1,15 @@
+{
+    "suggest.autoTrigger": "always",
+    "suggest.noselect": false,
+    "languageserver": {
+        "php": {
+            "command": "php",
+            "args": ["-S", "localhost:8000"],
+            "filetypes": ["php"],
+            "initializationOptions": {
+                "format": true
+            }
+        }
+    }
+}
+

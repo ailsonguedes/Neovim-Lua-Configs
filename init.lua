@@ -3,7 +3,6 @@ require('usermod.settings')
 
 -- Load pag-nvim
 local install_path = vim.fn.stdpath('data')..'site/pack/paqs/start/paq-nvim'
-local paq_lua_path = install_path .. '/lua/paq.lua'
 
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
     vim.fn.system({'git', 'clone', '--depth=1', 'https://github.com/savq/paq-nvim', install_path})
@@ -19,8 +18,55 @@ require('paq'){
     'sainnhe/sonokai';
     'vim-airline/vim-airline';
     'vim-airline/vim-airline-themes';
+    'nvim-lualine/lualine.nvim';
+    'nvim-tree/nvim-web-devicons';
+    'nvim-tree/nvim-tree.lua';
     'preservim/nerdtree';
     'dense-analysis/ale';
+    {'neoclide/coc.nvim', branch = "release"};
+    'weirongxu/coc-explorer';
+    'nvim-lua/plenary.nvim';
+    'neovim/nvim-lspconfig'; -- LSP
+    'hrsh7th/nvim-cmp'; -- Autocompletar
+    'hrsh7th/cmp-nvim-lsp'; -- Integração com LSP
+
+}
+
+require('lualine').setup {
+    options = {
+        icons_enabled = true,
+        theme = 'tokyonight',
+        component_separators = {'', ''},
+        section_separators = {'', ''},
+    }
+}
+
+require('nvim-tree').setup {
+    -- Opções que foram atualizadas ou corrigidas
+    update_cwd = true,
+    view = {
+        width = 30,
+        side = 'left',
+    },
+    renderer = {
+        icons = {
+            show = {
+                file = true,
+                folder = true,
+                folder_arrow = true,
+                git = true,
+            },
+        },
+    },
+    diagnostics = {
+        enable = true,
+        icons = {
+            hint = "",
+            info = "",
+            warning = "",
+            error = "",
+        },
+    },
 }
 
 if vim.fn.has("nvim") == 1 then
@@ -54,7 +100,11 @@ vim.o.writebackup = true -- No backup files
 vim.o.splitright = true -- Create the vertical splits to the right
 vim.o.splitbelow = true -- Create the horizontal splits below
 vim.o.autoread = true -- Update vim after file update from outside
+vim.o.autoindent = true -- Automatic identation
 vim.o.mouse = 'a' -- Eneable mouse support
+vim.o.hlsearch = true -- Mark to search results
+vim.o.syntax = 'on'
+vim.o.number = true
 vim.cmd('filetype on') -- Detect and set the filetype option and trigger the FileTYpe Event
 vim.cmd('filetype plugin on') -- Load the plugin file for the file type, if any
 vim.cmd('filetype indent on') -- Load the indent file for the file type, if any
@@ -63,6 +113,9 @@ vim.cmd('filetype indent on') -- Load the indent file for the file type, if any
 require('themes.andromedaTm')
 
 -- Remaps
+
+-- Map leader
+vim.g.mapleader = " "
 
 -- Shortcuts for split navigation
 vim.api.nvim_set_keymap('n', '<C-h>', '<C-w>h', { noremap = true, silent = true})
@@ -95,8 +148,23 @@ vim.api.nvim_set_keymap('n', 'tt', ':q<CR>', { noremap = true, silent = true})
 -- Call command shortcut
 vim.api.nvim_set_keymap('n', 'tc', ':!', { noremap = true, silent = true})
 
--- Define space as a key leader
-vim.g.mapleader = " "
+-- Remap exit insertion mode
+vim.api.nvim_set_keymap("i", "jj", "<Esc>", { noremap = true, silent = true})
+
+-- Save files with <leader>s
+vim.api.nvim_set_keymap("n", "<leader>", ":w<CR>", { noremap = true, silent = true})
+
+-- Coc-Explorer shortcuts
+vim.api.nvim_set_keymap("n", "<leader>ce", ":CocCommand explorer<CR>", { noremap = true, silent = true})
+
+-- Open the file explorer (NERDTree or NvimTree)
+vim.api.nvim_set_keymap("n", "<leader>e", ":NvimTreeToggle<CR>", { noremap = true, silent = true})
+
+-- Telescope shortcuts
+vim.api.nvim_set_keymap("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", { noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { noremap = true, silent = true})
 
 -- Autocmd
 
@@ -131,7 +199,7 @@ vim.cmd([[
 
 vim.g['airline#extensions#tabline#enabled'] = 1 -- Enable tabline airline extension
 vim.g['airline_powerline_fonts'] = 1 -- Activate powerline fonts in airline
-vim.g.airline_theme = 'molokai' -- Select Airline Theme
+vim.g.airline_theme = 'sonokai' -- Select Airline Theme
 
 -- NerdTRee
 vim.api.nvim_set_keymap('n', '<C-a>', ':NERDTreeToggle<CR>', {noremap = true, silent = true})
@@ -167,8 +235,8 @@ end
 
 -- C/C++
 vim.g.ale_c_clangformat_options = [["-style"{
-    BasedOnStyle: google, 
-    IndentWidth: 4, 
+    BasedOnStyle: google,
+    IndentWidth: 4,
     ColumnLimit: 100,
     AllowShortBlocksOnASingleLine: Always,
     AllowShortFunctionsOnASingleLine: Inline,
