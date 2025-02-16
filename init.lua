@@ -29,6 +29,8 @@ require('paq'){
     'neovim/nvim-lspconfig'; -- LSP
     'hrsh7th/nvim-cmp'; -- Autocompletar
     'hrsh7th/cmp-nvim-lsp'; -- Integração com LSP
+    'nvim-treesitter/nvim-treesitter'; -- Syntax highlight melhorado
+    'mrcjkb/haskell-tools.nvim'; -- Ferramentas para Haskell
 
 }
 
@@ -67,6 +69,12 @@ require('nvim-tree').setup {
             error = "",
         },
     },
+}
+
+require("nvim-treesitter.configs").setup {
+    ensure_installed = { "haskell", "python", "c", "cpp" },
+    highlight = { enable = true },
+    indent = { enable = true }
 }
 
 if vim.fn.has("nvim") == 1 then
@@ -165,6 +173,24 @@ vim.api.nvim_set_keymap("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { no
 vim.api.nvim_set_keymap("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", { noremap = true, silent = true})
 vim.api.nvim_set_keymap("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { noremap = true, silent = true})
 vim.api.nvim_set_keymap("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { noremap = true, silent = true})
+
+-- LSP
+local lspconfig = require("lspconfig")
+
+lspconfig.hls.setup({
+    on_attach = function(client, bufnr)
+        local opts = { buffer = bufnr, noremap = true, silent = true }
+        vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+        vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+        vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+        vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+    end,
+    settings = {
+        haskell = {
+            formattingProvider = "ormolu"
+        }
+    }
+})
 
 -- Autocmd
 
