@@ -1,274 +1,139 @@
-require('basic')
-require('usermod.settings')
+-- ============================================================================
+-- INIT.LUA FINAL - CONFIGURAÇÃO COMPLETA
+-- ============================================================================
 
--- Load pag-nvim
-local install_path = vim.fn.stdpath('data')..'site/pack/paqs/start/paq-nvim'
+-- 1. CONFIGURAÇÃO DE CAMINHOS E PAQ
+-- ============================================================================
 
+-- Configura paths para módulos customizados em ~/.config/nvim/lua/
+local config_path = vim.fn.stdpath('config')
+package.path = package.path .. ';' .. config_path .. '/lua/?.lua;' .. config_path .. '/lua/?/init.lua'
+
+-- Garante que o Paq (e plugins) sejam instalados em ~/.local/share/nvim/ (DATA)
+local install_path = vim.fn.stdpath('data') .. '/site/pack/paqs/start/paq-nvim'
+
+-- Bootstrap do Paq (se não existir, clona via HTTPS para garantir)
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-    vim.fn.system({'git', 'clone', '--depth=1', 'https://github.com/savq/paq-nvim', install_path})
+    vim.fn.system({
+        'git', 'clone', '--depth=1', 'https://github.com/savq/paq-nvim.git', install_path
+    })
 end
 
-package.path = package.path .. ';' .. install_path .. 'lua/?.lua'
+-- Carrega o Paq e adiciona o diretório de plugins ao runtimepath
+vim.cmd("packadd paq-nvim")
 
--- Loading paq-nvim plugins
-require('paq'){
-    -- Plugins
+-- 2. LISTA DE PLUGINS
+-- ============================================================================
+require("paq")({
     'savq/paq-nvim';
-    'folke/tokyonight.nvim';
-    'sainnhe/sonokai';
-    'vim-airline/vim-airline';
-    'vim-airline/vim-airline-themes';
-    'nvim-lualine/lualine.nvim';
-    'nvim-tree/nvim-web-devicons';
-    'nvim-tree/nvim-tree.lua';
-    'preservim/nerdtree';
-    'dense-analysis/ale';
-    {'neoclide/coc.nvim', branch = "release"};
-    'weirongxu/coc-explorer';
-    'nvim-lua/plenary.nvim';
-    'neovim/nvim-lspconfig'; -- LSP
-    'hrsh7th/nvim-cmp'; -- Autocompletar
-    'hrsh7th/cmp-nvim-lsp'; -- Integração com LSP
-    'nvim-treesitter/nvim-treesitter'; -- Syntax highlight melhorado
-    'mrcjkb/haskell-tools.nvim'; -- Ferramentas para Haskell
 
-}
+    -- Temas e UI
+    { 'folke/tokyonight.nvim', url = 'git@github.com:folke/tokyonight.nvim.git' };
+    { 'nvim-lualine/lualine.nvim', url = 'git@github.com:nvim-lualine/lualine.nvim.git' };
+    { 'nvim-tree/nvim-web-devicons', url = 'git@github.com:nvim-tree/nvim-web-devicons.git' };
+    { 'nvim-tree/nvim-tree.lua', url = 'git@github.com:nvim-tree/nvim-tree.lua.git' };
+    
+    -- Utilidades
+    { 'dense-analysis/ale', url = 'git@github.com:dense-analysis/ale.git' };
+    { 'nvim-lua/plenary.nvim', url = 'git@github.com:nvim-lua/plenary.nvim.git' };
+    { 'nvim-telescope/telescope.nvim', url = 'git@github.com:nvim-telescope/telescope.nvim.git' };
 
-require('lualine').setup {
-    options = {
-        icons_enabled = true,
-        theme = 'tokyonight',
-        component_separators = {'', ''},
-        section_separators = {'', ''},
-    }
-}
+    -- LSP & Autocomplete
+    { 'neovim/nvim-lspconfig', url = 'git@github.com:neovim/nvim-lspconfig.git' };
+    { 'hrsh7th/nvim-cmp', url = 'git@github.com:hrsh7th/nvim-cmp.git' };
+    { 'hrsh7th/cmp-nvim-lsp', url = 'git@github.com:hrsh7th/cmp-nvim-lsp.git' };
+    -- { 'hrsh7th/vim-vsnip' }; -- REMOVIDO TEMPORARIAMENTE PARA EVITAR ERROS
 
-require('nvim-tree').setup {
-    -- Opções que foram atualizadas ou corrigidas
-    update_cwd = true,
-    view = {
-        width = 30,
-        side = 'left',
-    },
-    renderer = {
-        icons = {
-            show = {
-                file = true,
-                folder = true,
-                folder_arrow = true,
-                git = true,
-            },
-        },
-    },
-    diagnostics = {
-        enable = true,
-        icons = {
-            hint = "",
-            info = "",
-            warning = "",
-            error = "",
-        },
-    },
-}
-
-require("nvim-treesitter.configs").setup {
-    ensure_installed = { "haskell", "python", "c", "cpp" },
-    highlight = { enable = true },
-    indent = { enable = true }
-}
-
-if vim.fn.has("nvim") == 1 then
-    require('paq'){
-        'nvim-lua/plenary.nvim';
-        'nvim-telescope/telescope.nvim';
-    }
-end
-
--- Global Sets
-vim.cmd('syntax on')
-vim.o.number = true -- Enable line numbers
-vim.o.tabstop = 4   -- Show existing tab with 4 space width
-vim.o.softtabstop = 4 -- Show existing tab with 4 spaces width
-vim.o.shiftwidth = 4 -- When identing with '>', use 4 spaces width
-vim.o.expandtab = true -- On pressing tab, insert 4 spaces width
-vim.o.expandtab = true -- Insert tabs on the start of a line according to shiftwidth
-vim.o.smartindent = true -- Automatically inserts one extra level of identation in some cases
-vim.o.hidden = true -- Hides the current buffer when a new file is openned
-vim.o.incsearch = true -- Incremental search
-vim.o.ignorecase = true -- Ignore cas in search
-vim.smartcase = true -- Consider case if there is a upper case character
-vim.o.scrolloff = 8 -- Minimum number of lines to keep above and below the cursor
-vim.o.colorcolumn = "100" -- Draws a line at the giver lines to keep aware of the line size
-vim.o.signcolumn = 'yes' -- Add a column on the left. Useful for linting.
-vim.o.cmdheight = 2 -- Give more space for displaying messages
-vim.o.updatetime = 100 -- Time in miliseconds to consider the changes
-vim.o.encoding = 'utf-8' -- The encoding should be utf-8 to active the font icons
-vim.o.backup = false -- No backup files
-vim.o.writebackup = true -- No backup files
-vim.o.splitright = true -- Create the vertical splits to the right
-vim.o.splitbelow = true -- Create the horizontal splits below
-vim.o.autoread = true -- Update vim after file update from outside
-vim.o.autoindent = true -- Automatic identation
-vim.o.mouse = 'a' -- Eneable mouse support
-vim.o.hlsearch = true -- Mark to search results
-vim.o.syntax = 'on'
-vim.o.number = true
-vim.cmd('filetype on') -- Detect and set the filetype option and trigger the FileTYpe Event
-vim.cmd('filetype plugin on') -- Load the plugin file for the file type, if any
-vim.cmd('filetype indent on') -- Load the indent file for the file type, if any
-
--- Themes
-require('themes.andromedaTm')
-
--- Remaps
-
--- Map leader
-vim.g.mapleader = " "
-
--- Shortcuts for split navigation
-vim.api.nvim_set_keymap('n', '<C-h>', '<C-w>h', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<C-j>', '<C-w>j', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<C-k>', '<C-w>k', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<C-l>', '<C-w>l', { noremap = true, silent = true})
-
--- Adding an empty line below, above and below with insert mode
-vim.api.nvim_set_keymap('n', 'op', 'o<Esc>k', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', 'oi', 'O<Esc>j', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', 'oo', 'A<CR>', { noremap = true, silent = true})
-
--- Create a tab
-vim.api.nvim_set_keymap('n', 'te', ':tabe<CR>', { noremap = true, silent = true})
-
--- Navigate between buffers
-vim.api.nvim_set_keymap('n', 'ty', ':bn<CR>', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', 'tr', ':bp<CR>', { noremap = true, silent = true})
-
--- Delete a buffer
-vim.api.nvim_set_keymap('n', 'td', ':bd<CR>', { noremap = true, silent = true})
-
--- Create splits
-vim.api.nvim_set_keymap('n', 'th', ':split<CR>', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', 'tv', ':vsplit<CR>', { noremap = true, silent = true})
-
--- Close splits and others
-vim.api.nvim_set_keymap('n', 'tt', ':q<CR>', { noremap = true, silent = true})
-
--- Call command shortcut
-vim.api.nvim_set_keymap('n', 'tc', ':!', { noremap = true, silent = true})
-
--- Remap exit insertion mode
-vim.api.nvim_set_keymap("i", "jj", "<Esc>", { noremap = true, silent = true})
-
--- Save files with <leader>s
-vim.api.nvim_set_keymap("n", "<leader>", ":w<CR>", { noremap = true, silent = true})
-
--- Coc-Explorer shortcuts
-vim.api.nvim_set_keymap("n", "<leader>ce", ":CocCommand explorer<CR>", { noremap = true, silent = true})
-
--- Open the file explorer (NERDTree or NvimTree)
-vim.api.nvim_set_keymap("n", "<leader>e", ":NvimTreeToggle<CR>", { noremap = true, silent = true})
-
--- Telescope shortcuts
-vim.api.nvim_set_keymap("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { noremap = true, silent = true})
-vim.api.nvim_set_keymap("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", { noremap = true, silent = true})
-vim.api.nvim_set_keymap("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { noremap = true, silent = true})
-vim.api.nvim_set_keymap("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { noremap = true, silent = true})
-
--- LSP
-local lspconfig = require("lspconfig")
-
-lspconfig.hls.setup({
-    on_attach = function(client, bufnr)
-        local opts = { buffer = bufnr, noremap = true, silent = true }
-        vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-        vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-        vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-        vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-    end,
-    settings = {
-        haskell = {
-            formattingProvider = "ormolu"
-        }
-    }
+    -- Treesitter
+    { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', url = 'git@github.com:nvim-treesitter/nvim-treesitter.git' };
+    
+    -- Haskell
+    { 'mrcjkb/haskell-tools.nvim', url = 'git@github.com:mrcjkb/haskell-tools.nvim.git' };
 })
 
--- Autocmd
+-- 3. CARREGAMENTO DE MÓDULOS CUSTOMIZADOS
+-- ============================================================================
+-- Tenta carregar 'basic' e 'usermod.settings' se existirem. 
+-- O pcall impede que o Neovim quebre se os arquivos não existirem.
+pcall(require, 'basic')
+pcall(require, 'usermod.settings')
 
--- Função para destacar a palavra sob o cursor
-function HighlightWordUnderCursor()
-    vim.notify("HighlightWordUnderCursor()")
-    -- Obter a linha atual
-    local line = vim.fn.getline('.')
-    -- Obter a posição da coluna atual
-    local col = vim.fn.col('.')
-    -- Obter a palavra sob o cursor
-    local word = vim.fn.expand('<cword>')
+-- 4. CONFIGURAÇÕES GERAIS (Backup do basic.lua)
+-- ============================================================================
+vim.opt.number = true
+vim.opt.relativenumber = true -- Opcional: números relativos
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
+vim.opt.smartindent = true
+vim.opt.termguicolors = true -- Importante para o tokyonight
+vim.opt.mouse = 'a'
+vim.opt.signcolumn = 'yes'
+vim.opt.encoding = 'utf-8'
 
-    -- Verificar se a palavra não está vazia e não contém pontuação ou espaços em branco
-    if #word > 0 and not vim.fn.matchstr(word, '[[:punct:][:blank:]]') then
-        -- Definir o padrão de destaque para a palavra
-        vim.api.nvim_exec("match Search /\\V\\<" .. word .. "\\>/", false)
-    else
-        -- Limpar qualquer destaque atual
-        vim.api.nvim_exec("match none", false)
-    end
-end
+-- 5. CONFIGURAÇÃO DOS PLUGINS
+-- ============================================================================
 
-vim.cmd([[
-  augroup HighlightWordUnderCursor
-      autocmd!
-      autocmd CursorHold, CursorHoldI * lua HighlightWordUnderCursor()
-  augroup END
-]])
+-- Tema
+vim.cmd('colorscheme tokyonight')
 
--- AirLine
+-- Lualine
+require('lualine').setup {
+    options = { theme = 'tokyonight' }
+}
 
-vim.g['airline#extensions#tabline#enabled'] = 1 -- Enable tabline airline extension
-vim.g['airline_powerline_fonts'] = 1 -- Activate powerline fonts in airline
-vim.g.airline_theme = 'sonokai' -- Select Airline Theme
+-- Nvim-Tree
+require('nvim-tree').setup {}
 
--- NerdTRee
-vim.api.nvim_set_keymap('n', '<C-a>', ':NERDTreeToggle<CR>', {noremap = true, silent = true})
+-- Treesitter
+require('nvim-treesitter.configs').setup {
+    ensure_installed = { "c", "lua", "vim", "python", "haskell" },
+    highlight = { enable = true },
+}
 
 -- ALE
+vim.g.ale_linters = { cpp = {}, c = {} }
+vim.g.ale_fixers = { ['*'] = {'trim_whitespace'} }
 
--- Config ALE linters
-vim.g.ale_linters = {
-    cpp = {},
-    c = {},
+-- LSP Config (CORREÇÃO IMPORTANTE: usa 'lspconfig' e não 'nvim-lspconfig')
+local lspconfig = require('lspconfig')
+
+-- Configuração Python (Pyright)
+lspconfig.pyright.setup{}
+
+-- Configuração Haskell (HLS)
+-- Nota: haskell-tools pode gerenciar isso automaticamente, mas aqui está o fallback
+lspconfig.hls.setup{
+    filetypes = { 'haskell', 'lhaskell', 'cabal' },
 }
 
--- Config ALE fixers
-vim.g.ale_fixers = {
-    ['*'] = {'trim_whitespace'},
-    cpp = {'clang-format'},
-    c = {'clang-format'},
-}
+-- Nvim-CMP (Autocomplete)
+local cmp = require('cmp')
+cmp.setup({
+    snippet = {
+        -- Como removemos o vsnip, usamos uma função simples para evitar erro
+        expand = function(args)
+             -- vim.fn["vsnip#anonymous"](args.body) -- Desativado pois vsnip foi removido
+        end,
+    },
+    mapping = cmp.mapping.preset.insert({
+        ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.abort(),
+        ['<CR>'] = cmp.mapping.confirm({ select = true }), 
+    }),
+    sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'buffer' },
+    })
+})
 
--- Enable the auto correction in save
-vim.g.ale_fix_on_save = 1
+-- Telescope Keymaps
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 
--- NeoVim
-if vim.fn.has('nvim') == 1 then
-
-    -- Telescope
-    vim.api.nvim_set_keymap('n', '<leader>ff', '<cmd>Telescope find_files<cr>', {noremap = true, silent = true})
-    vim.api.nvim_set_keymap('n', '<leader>fg', '<cmd>Telescope live_grep<cr>', {noremap = true, silent = true})
-    vim.api.nvim_set_keymap('n', '<leader>fb', '<cmd>Telescope buffers<cr>', {noremap = true, silent = true})
-    vim.api.nvim_set_keymap('n', '<leader>fh', '<cmd>Telescope help_tags<cr>', {noremap = true, silent = true})
-
-end
-
--- C/C++
-vim.g.ale_c_clangformat_options = [["-style"{
-    BasedOnStyle: google,
-    IndentWidth: 4,
-    ColumnLimit: 100,
-    AllowShortBlocksOnASingleLine: Always,
-    AllowShortFunctionsOnASingleLine: Inline,
-    FixNamespaceComments: true,
-    ReflowComments: false,
-}
-]]
-
-
+print("Configuração carregada com sucesso!")
